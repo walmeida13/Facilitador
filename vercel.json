@@ -1,27 +1,9 @@
 {
   "buildCommand": "npm install",
-  "public": "public",
   "functions": {
     "api/**/*.js": {
       "memory": 3008,
       "maxDuration": 60
     }
-  },
-  "env": {
-    "GOOGLE_PROJECT_ID": "@google_project_id",
-    "GOOGLE_PRIVATE_KEY_ID": "@google_private_key_id",
-    "GOOGLE_PRIVATE_KEY": "@google_private_key",
-    "GOOGLE_CLIENT_EMAIL": "@google_client_email",
-    "GOOGLE_CLIENT_ID": "@google_client_id"
-  },
-  "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "/api/$1"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/public/$1"
-    }
-  ]
+  }
 }
