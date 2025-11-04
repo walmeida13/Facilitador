@@ -1,11 +1,16 @@
 {
   "name": "facilitador",
-  "version": "1.0.0",
-  "description": "Conversor PDF/DOCX para Markdown com OCR Google Cloud Vision",
-  "dependencies": {
-    "@google-cloud/vision": "^4.7.0"
-  },
+  "version": "2.0.0",
+  "description": "Conversor PDF/DOCX para Markdown com Google Cloud Vision OCR",
   "scripts": {
-    "install": "npm install"
+    "dev": "vercel dev"
+  },
+  "dependencies": {
+    "@google-cloud/vision": "3.6.0"
+  },
+  "devDependencies": {},
+  "engines": {
+    "node": "18.x"
   }
 }
+```
