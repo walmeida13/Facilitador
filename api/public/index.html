@@ -71,28 +71,34 @@
     <textarea id="resultado" placeholder="Resultado em Markdown aparecerá aqui..."></textarea>
 
     <script>
-      const form = document.getElementById("form");
-      const status = document.getElementById("status");
-      const resultado = document.getElementById("resultado");
+  const form = document.getElementById("form");
+  const status = document.getElementById("status");
+  const resultado = document.getElementById("resultado");
 
-      form.addEventListener("submit", async (e) => {
-        e.preventDefault();
-        status.textContent = "Enviando arquivo...";
-        resultado.value = "";
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    status.textContent = "Enviando arquivo...";
+    resultado.value = "";
 
-        const formData = new FormData(form);
-        try {
-          const response = await fetch("/api", { method: "POST", body: formData });
-          const data = await response.json();
+    const fd = new FormData(form);
+    try {
+      const resp = await fetch("/api", { method: "POST", body: fd });
 
-          if (!response.ok) throw new Error(data.error || "Falha na conversão");
-          resultado.value = data.markdown || "";
-          status.textContent = "Conversão concluída ✅";
-        } catch (err) {
-          console.error(err);
-          status.textContent = "Erro: " + err.message;
-        }
-      });
-    </script>
+      const ct = resp.headers.get("content-type") || "";
+      const body = ct.includes("application/json") ? await resp.json() : await resp.text();
+
+      if (!resp.ok) {
+        const msg = typeof body === "string" ? body : (body.error || JSON.stringify(body));
+        throw new Error(msg);
+      }
+
+      resultado.value = (body.markdown || "");
+      status.textContent = "Conversão concluída ✅";
+    } catch (err) {
+      status.textContent = "Erro: " + err.message +
+        " (dica: se o PDF for grande, compacte para <4 MB ou use upload direto ao GCS)";
+    }
+  });
+</script>
   </body>
 </html>
