@@ -41,25 +41,29 @@ module.exports = async (req, res) => {
       });
     }
 
-    console.log('Processando com Google Cloud Vision...');
+    console.log('Iniciando OCR com Google Cloud Vision...');
 
     // Processa com Google Cloud Vision
-    const [result] = await client.textDetection({
+    const [result] = await client.documentTextDetection({
       image: {
         content: imageBase64
       }
     });
 
-    const detections = result.textAnnotations;
-    const text = detections.length > 0 ? detections[0].description : '';
+    // Pega o texto completo
+    const fullText = result.fullTextAnnotation ? 
+                    result.fullTextAnnotation.text : 
+                    (result.textAnnotations && result.textAnnotations[0] ? 
+                     result.textAnnotations[0].description : '');
 
-    // Limpa e corrige o texto específico para português
-    const cleanText = text
+    // Limpa e formata o texto
+    const cleanText = fullText
       .replace(/[\x00-\x1F\x7F-\x9F]/g, '') // Remove caracteres de controle
+      .replace(/\r\n/g, '\n') // Normaliza quebras de linha
       .replace(/\s+/g, ' ') // Normaliza espaços
       .trim();
 
-    console.log('OCR concluído com sucesso');
+    console.log('OCR concluído com sucesso!');
 
     return res.status(200).json({ 
       success: true, 
@@ -67,7 +71,7 @@ module.exports = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Erro no OCR:', error);
+    console.error('Erro detalhado no OCR:', error);
     return res.status(500).json({ 
       success: false, 
       error: error.message || 'Erro ao processar OCR' 
