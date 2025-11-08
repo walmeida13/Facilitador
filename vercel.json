@@ -1,17 +1,13 @@
 {
-  "functions": {
-    "api/ocr.js": {
-      "maxDuration": 30
-    }
+  "name": "facilitador",
+  "version": "1.0.0",
+  "description": "Conversor PDF/DOCX para Markdown com Google Cloud Vision OCR",
+  "scripts": {
+    "dev": "vercel dev"
   },
-  "rewrites": [
-    {
-      "source": "/api/(.*)",
-      "destination": "/api/$1"
-    },
-    {
-      "source": "/(.*)",
-      "destination": "/public/$1"
-    }
-  ]
+  "dependencies": {
+    "@google-cloud/vision": "^4.0.0"
+  },
+  "author": "",
+  "license": "MIT"
 }
