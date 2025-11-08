@@ -1,7 +1,17 @@
 {
-  "name": "facilitador",
-  "version": "1.0.0",
-  "dependencies": {
-    "@google-cloud/vision": "^4.7.0"
-  }
+  "functions": {
+    "api/ocr.js": {
+      "maxDuration": 30
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "/api/$1"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/public/$1"
+    }
+  ]
 }
