@@ -73,32 +73,61 @@
     <script>
   const form = document.getElementById("form");
   const status = document.getElementById("status");
-  const resultado = document.getElementById("resultado");
+  const out = document.getElementById("resultado");
+  const SIZE_LIMIT = 4 * 1024 * 1024; // ~4 MB
 
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
-    status.textContent = "Enviando arquivo...";
-    resultado.value = "";
+    status.textContent = "Enviando...";
+    out.value = "";
 
-    const fd = new FormData(form);
+    const file = form.querySelector('input[type="file"]').files[0];
+    if (!file) { status.textContent = "Escolha um arquivo"; return; }
+
     try {
-      const resp = await fetch("/api", { method: "POST", body: fd });
+      let result;
 
-      const ct = resp.headers.get("content-type") || "";
-      const body = ct.includes("application/json") ? await resp.json() : await resp.text();
+      if (file.size > SIZE_LIMIT) {
+        // 1) pede URL assinada
+        const sign = await fetch("/api/sign-url", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ filename: file.name, contentType: file.type })
+        });
+        const sdata = await sign.json();
+        if (!sign.ok) throw new Error(sdata.error || JSON.stringify(sdata));
 
-      if (!resp.ok) {
-        const msg = typeof body === "string" ? body : (body.error || JSON.stringify(body));
-        throw new Error(msg);
+        // 2) upload direto ao GCS
+        const put = await fetch(sdata.uploadUrl, { method: "PUT", headers: { "content-type": file.type }, body: file });
+        if (!put.ok) throw new Error("Falha no upload ao GCS");
+
+        // 3) pede conversão informando gcsUri
+        const conv = await fetch("/api", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ gcsUri: sdata.gcsUri, filename: file.name })
+        });
+        result = await conv.json();
+        if (!conv.ok) throw new Error(result.error || JSON.stringify(result));
+
+      } else {
+        // upload pequeno por multipart
+        const fd = new FormData();
+        fd.append("file", file);
+        const resp = await fetch("/api", { method: "POST", body: fd });
+        const ct = resp.headers.get("content-type") || "";
+        const body = ct.includes("application/json") ? await resp.json() : await resp.text();
+        if (!resp.ok) throw new Error(typeof body === "string" ? body : (body.error || JSON.stringify(body)));
+        result = body;
       }
 
-      resultado.value = (body.markdown || "");
+      out.value = result.markdown || "";
       status.textContent = "Conversão concluída ✅";
     } catch (err) {
-      status.textContent = "Erro: " + err.message +
-        " (dica: se o PDF for grande, compacte para <4 MB ou use upload direto ao GCS)";
+      status.textContent = "Erro: " + err.message;
     }
   });
 </script>
+
   </body>
 </html>
