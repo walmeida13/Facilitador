@@ -1,133 +1,631 @@
 <!DOCTYPE html>
-<html lang="pt-br">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Facilitador – Conversor PDF/DOCX → Markdown</title>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Facilitador - Conversor de Documentos</title>
     <style>
-      body {
-        font-family: system-ui, Arial, sans-serif;
-        margin: 0 auto;
-        padding: 2rem;
-        max-width: 800px;
-        color: #222;
-        background: #fafafa;
-      }
-      h1 {
-        text-align: center;
-        color: #333;
-      }
-      form {
-        display: flex;
-        flex-direction: column;
-        gap: 12px;
-        margin-bottom: 2rem;
-      }
-      input[type="file"] {
-        border: 1px solid #ccc;
-        padding: 8px;
-        border-radius: 6px;
-        background: white;
-      }
-      button {
-        padding: 10px 16px;
-        border: none;
-        border-radius: 6px;
-        background: #0070f3;
-        color: white;
-        font-weight: bold;
-        cursor: pointer;
-        transition: background 0.2s;
-      }
-      button:hover {
-        background: #0059c9;
-      }
-      #status {
-        font-size: 0.95rem;
-        color: #555;
-        margin-top: -5px;
-        margin-bottom: 1rem;
-      }
-      textarea {
-        width: 100%;
-        height: 360px;
-        border-radius: 6px;
-        border: 1px solid #ccc;
-        padding: 10px;
-        font-family: monospace;
-        font-size: 0.95rem;
-        resize: vertical;
-      }
-    </style>
-  </head>
-  <body>
-    <h1>Conversor PDF/DOCX → Markdown</h1>
-    <form id="form">
-      <input type="file" name="file" accept=".pdf,.docx,.jpg,.jpeg,.png" required />
-      <button type="submit">Converter</button>
-    </form>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-    <p id="status"></p>
-    <textarea id="resultado" placeholder="Resultado em Markdown aparecerá aqui..."></textarea>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e8ecf1 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .header {
+            background: white;
+            padding: 1.5rem 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 20px;
+        }
+
+        .logo-text h1 {
+            font-size: 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .logo-text p {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .header-buttons {
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn-header {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 3rem 2rem;
+        }
+
+        .hero {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .hero-badge {
+            display: inline-block;
+            padding: 8px 16px;
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+            border-radius: 20px;
+            font-size: 14px;
+            margin-bottom: 1.5rem;
+            font-weight: 500;
+        }
+
+        .hero h2 {
+            font-size: 48px;
+            margin-bottom: 1rem;
+            line-height: 1.2;
+        }
+
+        .hero h2 .highlight {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero p {
+            font-size: 18px;
+            color: #666;
+            margin-bottom: 2rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .upload-section {
+            background: white;
+            border-radius: 20px;
+            padding: 3rem;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+            margin-bottom: 3rem;
+        }
+
+        .upload-area {
+            border: 3px dashed #ddd;
+            border-radius: 15px;
+            padding: 3rem;
+            text-align: center;
+            transition: all 0.3s;
+            cursor: pointer;
+            background: #fafafa;
+        }
+
+        .upload-area:hover {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.05);
+        }
+
+        .upload-area.dragover {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .upload-icon {
+            font-size: 48px;
+            margin-bottom: 1rem;
+        }
+
+        .upload-area h3 {
+            font-size: 20px;
+            margin-bottom: 0.5rem;
+        }
+
+        .upload-area p {
+            color: #666;
+            margin-bottom: 1.5rem;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .btn-upload {
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-upload:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .file-info {
+            display: none;
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background: #f0f7ff;
+            border-radius: 10px;
+            text-align: left;
+        }
+
+        .file-info.active {
+            display: block;
+        }
+
+        .file-name {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+
+        .file-size {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .progress-bar {
+            display: none;
+            margin-top: 1.5rem;
+        }
+
+        .progress-bar.active {
+            display: block;
+        }
+
+        .progress-bg {
+            width: 100%;
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            width: 0%;
+            transition: width 0.3s;
+        }
+
+        .progress-text {
+            text-align: center;
+            margin-top: 0.5rem;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .result-section {
+            display: none;
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+            margin-bottom: 3rem;
+        }
+
+        .result-section.active {
+            display: block;
+        }
+
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .result-header h3 {
+            font-size: 20px;
+        }
+
+        .btn-download {
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-download:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .result-content {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 1.5rem;
+            max-height: 500px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .feature-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+            transition: all 0.3s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            margin-bottom: 1rem;
+        }
+
+        .feature-icon.purple {
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .feature-icon.blue {
+            background: rgba(52, 152, 219, 0.1);
+        }
+
+        .feature-icon.green {
+            background: rgba(46, 204, 113, 0.1);
+        }
+
+        .feature-card h4 {
+            font-size: 18px;
+            margin-bottom: 0.5rem;
+        }
+
+        .feature-card p {
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 2rem;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .status-message {
+            display: none;
+            padding: 1rem;
+            border-radius: 10px;
+            margin-top: 1rem;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .status-message.active {
+            display: block;
+        }
+
+        .status-message.success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-message.error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        @media (max-width: 768px) {
+            .hero h2 {
+                font-size: 32px;
+            }
+            
+            .upload-section {
+                padding: 2rem 1.5rem;
+            }
+            
+            .features {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="logo">
+            <div class="logo-icon">📄</div>
+            <div class="logo-text">
+                <h1>Facilitador</h1>
+                <p>Conversor de Documentos</p>
+            </div>
+        </div>
+        <div class="header-buttons">
+            <button class="btn-header btn-secondary" onclick="window.location.reload()">🔄 Limpar</button>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="hero">
+            <div class="hero-badge">✨ Simplifique seu fluxo de trabalho</div>
+            <h2>Converta seus documentos em<br><span class="highlight">Markdown</span></h2>
+            <p>Transforme arquivos PDF e DOCX em Markdown formatado com OCR de alta performance usando Tesseract.</p>
+        </div>
+
+        <div class="upload-section">
+            <div class="upload-area" id="uploadArea">
+                <div class="upload-icon">📤</div>
+                <h3>Arraste e solte seu arquivo aqui</h3>
+                <p>ou clique para selecionar</p>
+                <button class="btn-upload" onclick="document.getElementById('fileInput').click()">
+                    Selecionar Arquivo
+                </button>
+                <input type="file" id="fileInput" class="file-input" accept=".pdf,.docx,.jpg,.jpeg,.png">
+            </div>
+
+            <div class="file-info" id="fileInfo">
+                <div class="file-name" id="fileName"></div>
+                <div class="file-size" id="fileSize"></div>
+            </div>
+
+            <div class="progress-bar" id="progressBar">
+                <div class="progress-bg">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <div class="progress-text" id="progressText">Processando...</div>
+            </div>
+
+            <div class="status-message" id="statusMessage"></div>
+        </div>
+
+        <div class="result-section" id="resultSection">
+            <div class="result-header">
+                <h3>📝 Resultado da Conversão</h3>
+                <button class="btn-download" id="downloadBtn">⬇️ Baixar Markdown</button>
+            </div>
+            <div class="result-content" id="resultContent"></div>
+        </div>
+
+        <div class="features">
+            <div class="feature-card">
+                <div class="feature-icon purple">📤</div>
+                <h4>Upload Simples</h4>
+                <p>Arraste e solte seus arquivos PDF e DOCX ou selecione-os do seu computador.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon blue">🔍</div>
+                <h4>OCR Inteligente</h4>
+                <p>Tesseract OCR com pré-processamento automático para máxima precisão na extração de texto.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon green">⬇️</div>
+                <h4>Download Instantâneo</h4>
+                <p>Baixe seu documento Markdown unificado e formatado em segundos.</p>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        © 2025 Facilitador - Conversor de Documentos. Todos os direitos reservados.
+    </footer>
 
     <script>
-  const form = document.getElementById("form");
-  const status = document.getElementById("status");
-  const out = document.getElementById("resultado");
-  const SIZE_LIMIT = 4 * 1024 * 1024; // ~4 MB
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const fileInfo = document.getElementById('fileInfo');
+        const fileName = document.getElementById('fileName');
+        const fileSize = document.getElementById('fileSize');
+        const progressBar = document.getElementById('progressBar');
+        const progressFill = document.getElementById('progressFill');
+        const progressText = document.getElementById('progressText');
+        const statusMessage = document.getElementById('statusMessage');
+        const resultSection = document.getElementById('resultSection');
+        const resultContent = document.getElementById('resultContent');
+        const downloadBtn = document.getElementById('downloadBtn');
 
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    status.textContent = "Enviando...";
-    out.value = "";
+        let currentMarkdown = '';
 
-    const file = form.querySelector('input[type="file"]').files[0];
-    if (!file) { status.textContent = "Escolha um arquivo"; return; }
-
-    try {
-      let result;
-
-      if (file.size > SIZE_LIMIT) {
-        // 1) pede URL assinada
-        const sign = await fetch("/api/sign-url", {
-          method: "POST",
-          headers: { "content-type": "application/json" },
-          body: JSON.stringify({ filename: file.name, contentType: file.type })
+        // Drag and drop
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
         });
-        const sdata = await sign.json();
-        if (!sign.ok) throw new Error(sdata.error || JSON.stringify(sdata));
 
-        // 2) upload direto ao GCS
-        const put = await fetch(sdata.uploadUrl, { method: "PUT", headers: { "content-type": file.type }, body: file });
-        if (!put.ok) throw new Error("Falha no upload ao GCS");
-
-        // 3) pede conversão informando gcsUri
-        const conv = await fetch("/api", {
-          method: "POST",
-          headers: { "content-type": "application/json" },
-          body: JSON.stringify({ gcsUri: sdata.gcsUri, filename: file.name })
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
         });
-        result = await conv.json();
-        if (!conv.ok) throw new Error(result.error || JSON.stringify(result));
 
-      } else {
-        // upload pequeno por multipart
-        const fd = new FormData();
-        fd.append("file", file);
-        const resp = await fetch("/api", { method: "POST", body: fd });
-        const ct = resp.headers.get("content-type") || "";
-        const body = ct.includes("application/json") ? await resp.json() : await resp.text();
-        if (!resp.ok) throw new Error(typeof body === "string" ? body : (body.error || JSON.stringify(body)));
-        result = body;
-      }
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleFile(files[0]);
+            }
+        });
 
-      out.value = result.markdown || "";
-      status.textContent = "Conversão concluída ✅";
-    } catch (err) {
-      status.textContent = "Erro: " + err.message;
-    }
-  });
-</script>
+        uploadArea.addEventListener('click', (e) => {
+            if (e.target === uploadArea || e.target.closest('.upload-icon, h3, p')) {
+                fileInput.click();
+            }
+        });
 
-  </body>
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                handleFile(e.target.files[0]);
+            }
+        });
+
+        async function handleFile(file) {
+            // Show file info
+            fileName.textContent = `📄 ${file.name}`;
+            fileSize.textContent = `Tamanho: ${formatFileSize(file.size)}`;
+            fileInfo.classList.add('active');
+
+            // Hide previous results
+            resultSection.classList.remove('active');
+            statusMessage.classList.remove('active');
+
+            // Show progress
+            progressBar.classList.add('active');
+            progressFill.style.width = '30%';
+            progressText.textContent = 'Enviando arquivo...';
+
+            try {
+                // Upload file
+                const formData = new FormData();
+                formData.append('file', file);
+
+                progressFill.style.width = '50%';
+                progressText.textContent = 'Processando com OCR...';
+
+                const response = await fetch('/api', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                progressFill.style.width = '80%';
+                progressText.textContent = 'Finalizando...';
+
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({ error: 'Erro desconhecido' }));
+                    throw new Error(errorData.error || 'Falha na conversão');
+                }
+
+                const result = await response.json();
+                currentMarkdown = result.markdown || '';
+
+                progressFill.style.width = '100%';
+                progressText.textContent = 'Concluído! ✅';
+
+                // Show result
+                setTimeout(() => {
+                    progressBar.classList.remove('active');
+                    resultSection.classList.add('active');
+                    resultContent.textContent = currentMarkdown;
+                    
+                    showStatus('Conversão concluída com sucesso! ✅', 'success');
+                }, 500);
+
+            } catch (error) {
+                progressBar.classList.remove('active');
+                showStatus(`Erro: ${error.message}`, 'error');
+                console.error('Erro:', error);
+            }
+        }
+
+        downloadBtn.addEventListener('click', () => {
+            if (!currentMarkdown) return;
+
+            const blob = new Blob([currentMarkdown], { type: 'text/markdown' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'documento_convertido.md';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            showStatus('Download iniciado! 📥', 'success');
+        });
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+        }
+
+        function showStatus(message, type) {
+            statusMessage.textContent = message;
+            statusMessage.className = `status-message active ${type}`;
+            
+            setTimeout(() => {
+                statusMessage.classList.remove('active');
+            }, 5000);
+        }
+    </script>
+</body>
 </html>
