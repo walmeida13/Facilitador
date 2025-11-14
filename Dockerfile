@@ -15,8 +15,8 @@ RUN apt-get update && apt-get install -y \
     python3-pip \
     && rm -rf /var/lib/apt/lists/*
 
-# Instala OCRmyPDF
-RUN pip3 install --no-cache-dir ocrmypdf
+# Instala OCRmyPDF usando --break-system-packages para evitar conflito
+RUN pip3 install --break-system-packages --no-cache-dir ocrmypdf
 
 # Define diretório de trabalho
 WORKDIR /app
