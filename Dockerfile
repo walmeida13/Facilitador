@@ -1,5 +1,9 @@
-# Dockerfile para o Facilitador
+# Dockerfile para o Facilitador - Otimizado para Railway
 FROM node:22-slim
+
+# Define variáveis de ambiente
+ENV NODE_ENV=production
+ENV PORT=3000
 
 # Instala dependências do sistema
 RUN apt-get update && apt-get install -y \
@@ -21,13 +25,17 @@ WORKDIR /app
 COPY package*.json ./
 
 # Instala dependências do Node.js
-RUN npm install --production
+RUN npm ci --only=production
 
 # Copia o código da aplicação
 COPY . .
 
-# Expõe a porta (ajuste conforme necessário)
-EXPOSE 3000
+# Expõe a porta (Railway usa a variável PORT automaticamente)
+EXPOSE ${PORT}
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
+  CMD node -e "require('http').get('http://localhost:${PORT}/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"
 
 # Comando para iniciar a aplicação
 CMD ["npm", "start"]
