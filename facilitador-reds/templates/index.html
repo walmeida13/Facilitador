@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Facilitador REDS → CNVD/CNMP</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <!-- HEADER -->
+    <header class="header">
+        <div class="header-content">
+            <div class="header-left">
+                <div class="shield-icon">⚖</div>
+                <div>
+                    <h1>Facilitador REDS → CNVD</h1>
+                    <p class="subtitle">Cadastro Nacional de Violência Doméstica contra a Mulher</p>
+                </div>
+            </div>
+            <div class="header-right">
+                <span class="security-badge">🔒 Processamento 100% Local</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN -->
+    <main class="main-content">
+        <!-- UPLOAD SECTION -->
+        <section id="upload-section" class="card upload-card">
+            <h2>Upload do REDS</h2>
+            <p class="card-description">Selecione o arquivo PDF do REDS (Boletim de Ocorrência) para extração automática dos dados.</p>
+            
+            <div id="drop-zone" class="drop-zone">
+                <div class="drop-zone-content">
+                    <div class="upload-icon">📄</div>
+                    <p class="drop-text">Arraste o PDF aqui ou clique para selecionar</p>
+                    <p class="drop-hint">Apenas arquivos PDF — Máximo 50MB</p>
+                </div>
+                <input type="file" id="file-input" accept=".pdf" style="display: none;">
+            </div>
+
+            <div id="file-info" class="file-info" style="display: none;">
+                <span id="file-name" class="file-name"></span>
+                <button id="btn-remover" class="btn-remover" title="Remover arquivo">✕</button>
+            </div>
+
+            <button id="btn-processar" class="btn-primary" disabled>
+                <span class="btn-text">Processar REDS</span>
+                <span class="btn-loading" style="display: none;">
+                    <span class="spinner"></span> Processando...
+                </span>
+            </button>
+
+            <div id="mensagem-erro" class="mensagem-erro" style="display: none;"></div>
+        </section>
+
+        <!-- RESULTADO SECTION -->
+        <section id="resultado-section" class="resultado-section" style="display: none;">
+            
+            <!-- Aviso OCR -->
+            <div id="aviso-ocr" class="aviso-ocr" style="display: none;">
+                ⚠ Este PDF foi processado via OCR (escaneado). Verifique os dados extraídos com atenção.
+            </div>
+
+            <!-- BOTÕES DE AÇÃO GLOBAL -->
+            <div class="acoes-globais">
+                <button id="btn-copiar-tudo" class="btn-secondary" onclick="copiarTudo()">
+                    📋 Copiar Todos os Dados
+                </button>
+                <button id="btn-novo" class="btn-secondary" onclick="novoProcessamento()">
+                    📄 Processar Novo REDS
+                </button>
+            </div>
+
+            <!-- DADOS GERAIS -->
+            <div class="card resultado-card">
+                <h2 class="section-title">Dados Gerais da Ocorrência</h2>
+                <div class="campos-grid">
+                    <div class="campo">
+                        <label>Número da Ocorrência Policial (PCNet ou REDS)*</label>
+                        <div class="campo-valor">
+                            <span id="val-numero-reds" class="valor"></span>
+                            <button class="btn-copiar" onclick="copiarCampo('val-numero-reds')" title="Copiar">📋</button>
+                        </div>
+                    </div>
+                    <div class="campo">
+                        <label>Ambiente da Agressão*</label>
+                        <div class="campo-valor">
+                            <span id="val-ambiente" class="valor"></span>
+                            <button class="btn-copiar" onclick="copiarCampo('val-ambiente')" title="Copiar">📋</button>
+                        </div>
+                    </div>
+                    <div class="campo">
+                        <label>Vínculo do Agressor(a) com a Vítima*</label>
+                        <div class="campo-valor">
+                            <span id="val-vinculo" class="valor"></span>
+                            <button class="btn-copiar" onclick="copiarCampo('val-vinculo')" title="Copiar">📋</button>
+                        </div>
+                    </div>
+                    <div class="campo">
+                        <label>Data do Fato</label>
+                        <div class="campo-valor">
+                            <span id="val-data-fato" class="valor"></span>
+                            <button class="btn-copiar" onclick="copiarCampo('val-data-fato')" title="Copiar">📋</button>
+                        </div>
+                    </div>
+                    <div class="campo">
+                        <label>Hora do Fato</label>
+                        <div class="campo-valor">
+                            <span id="val-hora-fato" class="valor"></span>
+                            <button class="btn-copiar" onclick="copiarCampo('val-hora-fato')" title="Copiar">📋</button>
+                        </div>
+                    </div>
+                    <div class="campo">
+                        <label>Data da Autuação</label>
+                        <div class="campo-valor">
+                            <span id="val-data-autuacao" class="valor"></span>
+                            <button class="btn-copiar" onclick="copiarCampo('val-data-autuacao')" title="Copiar">📋</button>
+                        </div>
+                    </div>
+                    <div class="campo">
+                        <label>Cidade do Fato (UF)</label>
+                        <div class="campo-valor">
+                            <span id="val-uf-fato" class="valor"></span>
+                            <button class="btn-copiar" onclick="copiarCampo('val-uf-fato')" title="Copiar">📋</button>
+                        </div>
+                    </div>
+                    <div class="campo">
+                        <label>Cidade do Fato (Município)</label>
+                        <div class="campo-valor">
+                            <span id="val-cidade-fato" class="valor"></span>
+                            <button class="btn-copiar" onclick="copiarCampo('val-cidade-fato')" title="Copiar">📋</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- DADOS DA VÍTIMA -->
+            <div class="card resultado-card">
+                <h2 class="section-title vitima-title">Dados da Vítima</h2>
+                <div class="campos-grid">
+                    <div class="campo campo-largo">
+                        <label>Nome Civil</label>
+                        <div class="campo-valor">
+                            <span id="val-vitima-nome" class="valor"></span>
+                            <button class="btn-copiar" onclick="copiarCampo('val-vitima-nome')" title="Copiar">📋</button>
+                        </div>
+                    </div>
+                    <div class="campo campo-largo">
+                        <label>Nome Social</label>
+                        <div class="campo-valor">
+                            <span id="val-vitima-nome-social" class="valor"></span>
+                            <button class="btn-copiar" onclick="copiarCampo('val-vitima-nome-social')" title="Copiar">📋</button>
+                        </div>
+                    </div>
+                    <div class="campo">
+                        <label>CPF</label>
+                        <div class="campo-valor">
+                            <span id="val-vitima-cpf" class="valor"></span>
+                            <button class="btn-copiar" onclick="copiarCampo('val-vitima-cpf')" title="Copiar">📋</button>
+                        </div>
+                    </div>
+                    <div class="campo campo-largo">
+                        <label>Nome do Pai</label>
+                        <div class="campo-valor">
+                            <span id="val-vitima-pai" class="valor"></span>
+                            <button class="btn-copiar" onclick="copiarCampo('val-vitima-pai')" title="Copiar">📋</button>
+                        </div>
+                    </div>
+                    <div class="campo campo-largo">
+                        <label>Nome da Mãe</label>
+                        <div class="campo-valor">
+                            <span id="val-vitima-mae" class="valor"></span>
+                            <button class="btn-copiar" onclick="copiarCampo('val-vitima-mae')" title="Copiar">📋</button>
+                        </div>
+                    </div>
+                    <div class="campo">
+                        <label>Data de Nascimento</label>
+                        <div class="campo-valor">
+                            <span id="val-vitima-nascimento" class="valor"></span>
+                            <button class="btn-copiar" onclick="copiarCampo('val-vitima-nascimento')" title="Copiar">📋</button>
+                        </div>
+                    </div>
+                    <div class="campo">
+                        <label>Gênero*</label>
+                        <div class="campo-valor">
+                            <span id="val-vitima-genero" class="valor"></span>
+                            <button class="btn-copiar" onclick="copiarCampo('val-vitima-genero')" title="Copiar">📋</button>
+                        </div>
+                    </div>
+                    <div class="campo">
+                        <label>Cor/Raça</label>
+                        <div class="campo-valor">
+                            <span id="val-vitima-cor" class="valor"></span>
+                            <button class="btn-copiar" onclick="copiarCampo('val-vitima-cor')" title="Copiar">📋</button>
+                        </div>
+                    </div>
+                    <div class="campo">
+                        <label>Orientação Sexual</label>
+                        <div class="campo-valor">
+                            <span id="val-vitima-orientacao" class="valor"></span>
+                            <button class="btn-copiar" onclick="copiarCampo('val-vitima-orientacao')" title="Copiar">📋</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- DADOS DO AGRESSOR -->
+            <div class="card resultado-card">
+                <h2 class="section-title agressor-title">Dados do Agressor</h2>
+                <div class="campos-grid">
+                    <div class="campo campo-largo">
+                        <label>Nome Civil</label>
+                        <div class="campo-valor">
+                            <span id="val-agressor-nome" class="valor"></span>
+                            <button class="btn-copiar" onclick="copiarCampo('val-agressor-nome')" title="Copiar">📋</button>
+                        </div>
+                    </div>
+                    <div class="campo campo-largo">
+                        <label>Nome Social</label>
+                        <div class="campo-valor">
+                            <span id="val-agressor-nome-social" class="valor"></span>
+                            <button class="btn-copiar" onclick="copiarCampo('val-agressor-nome-social')" title="Copiar">📋</button>
+                        </div>
+                    </div>
+                    <div class="campo">
+                        <label>CPF</label>
+                        <div class="campo-valor">
+                            <span id="val-agressor-cpf" class="valor"></span>
+                            <button class="btn-copiar" onclick="copiarCampo('val-agressor-cpf')" title="Copiar">📋</button>
+                        </div>
+                    </div>
+                    <div class="campo campo-largo">
+                        <label>Nome do Pai</label>
+                        <div class="campo-valor">
+                            <span id="val-agressor-pai" class="valor"></span>
+                            <button class="btn-copiar" onclick="copiarCampo('val-agressor-pai')" title="Copiar">📋</button>
+                        </div>
+                    </div>
+                    <div class="campo campo-largo">
+                        <label>Nome da Mãe</label>
+                        <div class="campo-valor">
+                            <span id="val-agressor-mae" class="valor"></span>
+                            <button class="btn-copiar" onclick="copiarCampo('val-agressor-mae')" title="Copiar">📋</button>
+                        </div>
+                    </div>
+                    <div class="campo">
+                        <label>Data de Nascimento</label>
+                        <div class="campo-valor">
+                            <span id="val-agressor-nascimento" class="valor"></span>
+                            <button class="btn-copiar" onclick="copiarCampo('val-agressor-nascimento')" title="Copiar">📋</button>
+                        </div>
+                    </div>
+                    <div class="campo">
+                        <label>Gênero*</label>
+                        <div class="campo-valor">
+                            <span id="val-agressor-genero" class="valor"></span>
+                            <button class="btn-copiar" onclick="copiarCampo('val-agressor-genero')" title="Copiar">📋</button>
+                        </div>
+                    </div>
+                    <div class="campo">
+                        <label>Cor/Raça</label>
+                        <div class="campo-valor">
+                            <span id="val-agressor-cor" class="valor"></span>
+                            <button class="btn-copiar" onclick="copiarCampo('val-agressor-cor')" title="Copiar">📋</button>
+                        </div>
+                    </div>
+                    <div class="campo">
+                        <label>Orientação Sexual</label>
+                        <div class="campo-valor">
+                            <span id="val-agressor-orientacao" class="valor"></span>
+                            <button class="btn-copiar" onclick="copiarCampo('val-agressor-orientacao')" title="Copiar">📋</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+        <p>Facilitador REDS → CNVD/CNMP — Processamento 100% local e seguro</p>
+        <p class="footer-small">Nenhum dado é enviado para servidores externos. Todos os dados são processados em memória e descartados após o uso.</p>
+    </footer>
+
+    <!-- TOAST NOTIFICATION -->
+    <div id="toast" class="toast" style="display: none;">
+        <span id="toast-text"></span>
+    </div>
+
+    <script src="/static/js/app.js"></script>
+</body>
+</html>
